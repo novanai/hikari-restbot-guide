@@ -3,6 +3,7 @@ import os
 
 import dotenv
 import hikari
+import hikari.api.special_endpoints as se
 
 dotenv.load_dotenv()
 
@@ -12,7 +13,21 @@ CLIENT_SECRET = os.environ["CLIENT_SECRET"]
 
 
 def build_commands(app: hikari.impl.RESTClientImpl) -> list[hikari.api.CommandBuilder]:
-    return [app.slash_command_builder("ping", "Ping the bot.")]
+    ping = app.slash_command_builder("ping", "Ping the bot.")
+
+    userinfo = (
+        app.slash_command_builder("userinfo", "Get info on a server member.")
+        .add_option(
+            hikari.CommandOption(
+                type=hikari.OptionType.USER,
+                name="user",
+                description="The user to get information about.",
+            )
+        )
+        .set_is_dm_enabled(False)
+    )
+
+    return [ping, userinfo]
 
 
 async def register() -> None:
