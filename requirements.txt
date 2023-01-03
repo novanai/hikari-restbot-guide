@@ -1,0 +1,2 @@
+hikari[speedups,server] @ git+https://github.com/hikari-py/hikari.git
+python-dotenv
