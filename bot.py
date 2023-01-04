@@ -4,6 +4,7 @@ import os
 
 import dotenv
 import hikari
+from hikari.impl import rest
 
 dotenv.load_dotenv()
 
@@ -75,28 +76,21 @@ def userinfo(event: hikari.CommandInteraction) -> hikari.api.InteractionMessageB
 
 async def on_interaction(
     event: hikari.CommandInteraction,
-) -> hikari.api.InteractionMessageBuilder:  # type: ignore
+) -> hikari.api.InteractionMessageBuilder:
     if event.command_name == "ping":
         return ping(event)
     elif event.command_name == "userinfo":
         return userinfo(event)
 
-
-async def get_token() -> str:
-    rest = hikari.RESTApp()
-    await rest.start()
-
-    async with rest.acquire(None) as app:
-        token = await app.authorize_client_credentials_token(
-            CLIENT_ID, CLIENT_SECRET, [hikari.OAuth2Scope.APPLICATIONS_COMMANDS_UPDATE]
-        )
-
-    await rest.close()
-    return token.access_token
+    return (
+        event.build_response()
+        .set_flags(hikari.MessageFlag.EPHEMERAL)
+        .set_content("Command not found.")
+    )
 
 
-token = asyncio.run(get_token())
+authorization = rest.ClientCredentialsStrategy(CLIENT_ID, CLIENT_SECRET, scopes=[])
 
-bot = hikari.RESTBot(token, "Bearer", banner=None)
+bot = hikari.RESTBot(authorization, banner=None)
 bot.set_listener(hikari.CommandInteraction, on_interaction)
 bot.run()

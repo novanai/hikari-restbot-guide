@@ -1,2 +1,2 @@
-hikari[speedups,server] @ git+https://github.com/hikari-py/hikari.git
-python-dotenv
+hikari[speedups,server]==2.0.0.dev115
+python-dotenv~=0.21.0

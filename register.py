@@ -3,7 +3,6 @@ import os
 
 import dotenv
 import hikari
-import hikari.api.special_endpoints as se
 
 dotenv.load_dotenv()
 
@@ -31,23 +30,23 @@ def build_commands(app: hikari.impl.RESTClientImpl) -> list[hikari.api.CommandBu
 
 
 async def register() -> None:
-    rest = hikari.RESTApp()
-    await rest.start()
+    app = hikari.RESTApp()
+    await app.start()
 
-    async with rest.acquire(None) as app:
-        token = await app.authorize_client_credentials_token(
+    async with app.acquire(None) as rest:
+        token = await rest.authorize_client_credentials_token(
             CLIENT_ID, CLIENT_SECRET, [hikari.OAuth2Scope.APPLICATIONS_COMMANDS_UPDATE]
         )
 
-    async with rest.acquire(token.access_token, "Bearer") as app:
-        commands = build_commands(app)
+    async with app.acquire(token.access_token, "Bearer") as rest:
+        commands = build_commands(rest)
 
-        await app.set_application_commands(
+        await rest.set_application_commands(
             CLIENT_ID,
             commands,
         )
 
-    await rest.close()
+    await app.close()
 
 
 asyncio.run(register())
